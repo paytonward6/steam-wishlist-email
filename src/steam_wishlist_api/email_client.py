@@ -1,9 +1,8 @@
+import logging
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Self
-import logging
 import smtplib
-
 
 from .settings import Settings
 
@@ -44,3 +43,5 @@ class EmailClient:
             to_addrs=self.to_addresses,
             msg=_msg().as_string()
         )
+
+        logging.info("Sent email")

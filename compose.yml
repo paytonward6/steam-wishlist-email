@@ -1,0 +1,3 @@
+services:
+  steam-wishlist-api:
+    build: .
