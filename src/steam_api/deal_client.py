@@ -1,10 +1,8 @@
-from typing import Optional
+from collections.abc import Sequence
+from typing import Any
 
 import requests
 from pydantic import Field, BaseModel, AliasPath
-
-from .steam_client import WishlistItem
-
 
 STEAM_STORE_ID = 61
 COUNTRY = "US"
@@ -29,14 +27,29 @@ class DealClient:
         self.key = key
         self.key_header = {"key": self.key}
 
-    def process_item(self, id: int, item: WishlistItem):
-        lookup = self.lookup(id)
-        return lookup.title, self.prices(lookup.id)
+    def process_items(self, ids: Sequence[int]):
+        items: dict[str, dict[str, Any]] = {}
+
+        for id in ids:
+            item = self.lookup(id)
+            items[item.id] = {"title": item.title}
+
+        prices = self.prices(list(items.keys()))
+
+        for price in prices:
+            items[price.id] |= price.model_dump(exclude={"id"})
+
+        return list(items.values())
 
     def lookup(self, id: int):
         response = requests.get("https://api.isthereanydeal.com/games/lookup/v1", params={"appid": id} | self.key_header)
         return DealLookup.model_validate(response.json())
 
-    def prices(self, id: str):
-        response = requests.post("https://api.isthereanydeal.com/games/prices/v2", params={"country": COUNTRY, "shops": [STEAM_STORE_ID]} | self.key_header, json=[id])
-        return DealPrices.model_validate(response.json()[0])
+    def prices(self, ids: Sequence[str]):
+        response = requests.post("https://api.isthereanydeal.com/games/prices/v2", params={"country": COUNTRY, "shops": [STEAM_STORE_ID]} | self.key_header, json=ids)
+
+        to_return: list[DealPrices] = []
+        for item in response.json():
+            to_return.append(DealPrices.model_validate(item))
+
+        return to_return

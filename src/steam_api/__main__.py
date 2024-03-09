@@ -4,6 +4,7 @@ from .steam_client import SteamClient
 from .deal_client import DealClient
 
 import pandas as pd
+from pretty_html_table import build_table
 
 
 def main():
@@ -14,12 +15,10 @@ def main():
 
         wishlist = steam_client.fetch_wishlist()
 
-        data = []
-        for id, item in wishlist.items():
-            title, prices = deal_client.process_item(id, item)
-            data.append({"title": title, **prices.model_dump(exclude={"id"})})
+        data = deal_client.process_items(list(wishlist.keys()))
 
-        email_client.send_message("Steam Deals", pd.DataFrame(data).to_html(), "html")
+        df = pd.DataFrame(data)
+        email_client.send_message("Steam Deals", build_table(df, "green_light"), "html")
 
 
 if __name__ == "__main__":
