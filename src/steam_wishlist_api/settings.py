@@ -30,7 +30,7 @@ class Settings(BaseModel):
         secrets_path = Path(secrets_dir)
         try:
             for file in os.listdir(secrets_path):
-                current_file = secrets_path/file
+                current_file = secrets_path / file
                 if current_file.is_dir():
                     continue
 
@@ -50,12 +50,13 @@ class Settings(BaseModel):
                         continue
 
                     name, value = line.split("=", 1)
-                    settings[name] = value.strip("\"").strip("\'")
+                    settings[name] = value.strip('"').strip("'")
         except Exception:
-            logging.debug("Failed to read secrets from env file '%s'" % env_path.absolute())
+            logging.debug(
+                "Failed to read secrets from env file '%s'" % env_path.absolute()
+            )
 
         # Merge with environment variables
         settings |= os.environ
 
         return cls.model_validate(settings)
-

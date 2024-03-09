@@ -33,7 +33,9 @@ class SteamWishlistEmailer:
             data = deal_client.process_items(list(wishlist.keys()))
 
             df = pd.DataFrame(data)
-            email_client.send_message("Steam Deals", build_table(df, "green_light"), "html")
+            email_client.send_message(
+                "Steam Deals", build_table(df, "green_light"), "html"
+            )
 
 
 def log_level():

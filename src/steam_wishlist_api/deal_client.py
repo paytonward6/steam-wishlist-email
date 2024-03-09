@@ -18,7 +18,9 @@ class DealPrices(BaseModel):
     price: float = Field(validation_alias=AliasPath("deals", 0, "price", "amount"))
     regular: float = Field(validation_alias=AliasPath("deals", 0, "regular", "amount"))
     cut: int = Field(validation_alias=AliasPath("deals", 0, "cut"))
-    store_low: float = Field(validation_alias=AliasPath("deals", 0, "storeLow", "amount"))
+    store_low: float = Field(
+        validation_alias=AliasPath("deals", 0, "storeLow", "amount")
+    )
     expiry: str = Field(validation_alias=AliasPath("deals", 0, "expiry"))
 
 
@@ -42,11 +44,18 @@ class DealClient:
         return list(items.values())
 
     def lookup(self, id: int):
-        response = requests.get("https://api.isthereanydeal.com/games/lookup/v1", params={"appid": id} | self.key_header)
+        response = requests.get(
+            "https://api.isthereanydeal.com/games/lookup/v1",
+            params={"appid": id} | self.key_header,
+        )
         return DealLookup.model_validate(response.json())
 
     def prices(self, ids: Sequence[str]):
-        response = requests.post("https://api.isthereanydeal.com/games/prices/v2", params={"country": COUNTRY, "shops": [STEAM_STORE_ID]} | self.key_header, json=ids)
+        response = requests.post(
+            "https://api.isthereanydeal.com/games/prices/v2",
+            params={"country": COUNTRY, "shops": [STEAM_STORE_ID]} | self.key_header,
+            json=ids,
+        )
 
         to_return: list[DealPrices] = []
         for item in response.json():

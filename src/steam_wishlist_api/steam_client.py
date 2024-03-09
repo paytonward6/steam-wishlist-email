@@ -7,7 +7,9 @@ from pydantic import BaseModel, AliasPath, Field, ValidationError
 
 class WishlistItem(BaseModel):
     name: str
-    discount_pct: int = Field(validation_alias=AliasPath("subs", 0, "discount_pct"), gt=0)
+    discount_pct: int = Field(
+        validation_alias=AliasPath("subs", 0, "discount_pct"), gt=0
+    )
     discount_block: str = Field(validation_alias=AliasPath("subs", 0, "discount_block"))
     price: str = Field(validation_alias=AliasPath("subs", 0, "price"))
 
@@ -18,10 +20,14 @@ class SteamClient:
             raise TypeError("User ID must be an int")
 
         self.user_id = user_id
-        self.wishlist_url = f"https://store.steampowered.com/wishlist/profiles/{user_id}/wishlistdata"
+        self.wishlist_url = (
+            f"https://store.steampowered.com/wishlist/profiles/{user_id}/wishlistdata"
+        )
 
     def fetch_wishlist(self):
-        response = requests.get(self.wishlist_url, headers={"Content-type": "application/json"})
+        response = requests.get(
+            self.wishlist_url, headers={"Content-type": "application/json"}
+        )
 
         wishlist: dict[int, WishlistItem] = {}
         for id, item in response.json().items():
@@ -31,4 +37,3 @@ class SteamClient:
                 logging.debug("Failed to validate %s" % item["name"])
 
         return wishlist
-

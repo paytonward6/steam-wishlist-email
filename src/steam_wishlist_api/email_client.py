@@ -18,7 +18,7 @@ class EmailClient:
 
     @staticmethod
     def configure_smtp():
-        smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        smtp = smtplib.SMTP("smtp.gmail.com", 587)
         smtp.ehlo()
         smtp.starttls()
 
@@ -33,7 +33,7 @@ class EmailClient:
     def send_message(self, subject: str, text: str, subtype: str = "plain"):
         def _msg():
             msg = MIMEMultipart()
-            msg['Subject'] = subject
+            msg["Subject"] = subject
             msg.attach(MIMEText(text, subtype))
 
             return msg
@@ -41,7 +41,7 @@ class EmailClient:
         self.smtp.sendmail(
             from_addr=self.settings.email_address,
             to_addrs=self.to_addresses,
-            msg=_msg().as_string()
+            msg=_msg().as_string(),
         )
 
         logging.info("Sent email")
