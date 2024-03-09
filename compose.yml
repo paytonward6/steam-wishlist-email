@@ -1,3 +1,7 @@
 services:
   steam-wishlist-api:
     build: .
+    environment:
+      - RUN_AT=07:30:00
+    env_file:
+      - .env

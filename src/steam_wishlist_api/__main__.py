@@ -57,9 +57,11 @@ def main():
     signal.signal(signal.SIGINT, steam_wishlist_emailer.shutdown)
     signal.signal(signal.SIGTERM, steam_wishlist_emailer.shutdown)
 
-    schedule.every().day.at("07:30:00").do(steam_wishlist_emailer.run)
+    schedule.every().day.at(os.getenv("RUN_AT", "07:30:00")).do(steam_wishlist_emailer.run)
 
     logging.info("Entering main loop...")
+
+    logging.info("Will run at %s" % schedule.next_run())
 
     while steam_wishlist_emailer.running:
         schedule.run_pending()
